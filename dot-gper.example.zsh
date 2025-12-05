@@ -109,7 +109,7 @@ project_code() {
 }
  
 # Default init - project search
-init_mgrep() {
+init_gper() {
   project_code
 }
  

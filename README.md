@@ -1,10 +1,10 @@
-# [mgrep](https://github.com/jcdevguru/mgrep/tree/main/mgrep)
+# [gper](https://github.com/jcdevguru/gper/tree/main/gper)
 
 - Type: CLI (zsh script)
 - Environment: MacOS (or any UNIX/Linux system with zsh)
 - Provided for: search through files
 
-## mgrep: search files for multiple terms in a source hierarchy
+## gper: search files for multiple terms in a source hierarchy
 
 Often, we are stuck having to search for text through a large number of files, and suffer from the problem of "too much" or "not enough."  Developers especially know this - we are often tasked with the need to find a piece of code, and although `egrep` and its variants are excellent low-level commands for searching, what they deliver in flexibility comes at the expense of usability.  One simple string search will match too many files.  A longer, more complicated version - after some painful minutes crafting a clever regular expression to cover all the possibilities - will end up getting it all wrong.
 
@@ -30,13 +30,13 @@ This call to `lodash`'s version of `reduce` would be missed.
 
 Clearly, our chances for success would go up considerably if we could search for files that contain *both* the words `lodash` and `reduce`.   However, to do this on the command line with calls to UNIX command line utilities like `find` and `egrep` would be cumbersome, since we would first have to find all the files that contain the word `lodash`, and then find occcurrences of `reduce` from those files alone.  This would require a tedious set of commands that require you to save file lists, fashion command lines, and so on.  
 
-That is exactly what `mgrep` does for you.  Here is the command line:
+That is exactly what `gper` does for you.  Here is the command line:
 
 ```sh
-mgrep -w lodash -w reduce
+gper -w lodash -w reduce
 ```
 
-The output will be a list of all the files (in and below the current directory) that contain occurrences of both `lodash` and `reduce` as distinct words, in any order, and not necessarily within the same line of text. The search for multiple strings at once is far more likely to match our objective than searches for just one string, and `mgrep` makes this convenient and simple.
+The output will be a list of all the files (in and below the current directory) that contain occurrences of both `lodash` and `reduce` as distinct words, in any order, and not necessarily within the same line of text. The search for multiple strings at once is far more likely to match our objective than searches for just one string, and `gper` makes this convenient and simple.
 
 ---
 
@@ -87,19 +87,19 @@ Spaces in file names might be exotic, but here are some other, more common compl
 - `egrep` will (by default) open and match non-textual files, which is usually not useful and will slow the search down unnecessarily
 - Just expanding the output of a command with `$(...)` may provide so many file names that the shell command line will hit system limits and fail
 
-`mgrep` manages all of the above, as explained below.
+`gper` manages all of the above, as explained below.
 
 ---
 
-### What mgrep does to make this work
+### What gper does to make this work
 
-First, let's try out the above case with `mgrep` and see what happens to make it work:
+First, let's try out the above case with `gper` and see what happens to make it work:
 
 ```sh
-mgrep forEach iterate
+gper forEach iterate
 ```
 
-In the above, `mgrep` will run the equivalent of:
+In the above, `gper` will run the equivalent of:
 
 ```sh
 git ls-files -z | \
@@ -121,7 +121,7 @@ In the search for `foreEach`, the commands `git ls-files`, `xargs`, and `egrep` 
 src/array-utils.js\0app/search.js\0test/test all.js
 ```
 
-The second command, which begins with `xargs -0`, will supply these files to `egrep` directly, without using the shell to expand them into a list. Even though `test all.js` has a space in its name, the file will be opened and searched correctly.  `mgrep` will then show its final results correctly.
+The second command, which begins with `xargs -0`, will supply these files to `egrep` directly, without using the shell to expand them into a list. Even though `test all.js` has a space in its name, the file will be opened and searched correctly.  `gper` will then show its final results correctly.
 
 ```
 ./src/array-utils.js
@@ -135,7 +135,7 @@ The second command, which begins with `xargs -0`, will supply these files to `eg
 
 ## Options
 
-`mgrep` accepts flags that start with `+`, not `-`, since flags that begin with `-` are passed to `egrep` (see below).  You can have multiple occurrences of flags to use for filtering. 
+`gper` accepts flags that start with `+`, not `-`, since flags that begin with `-` are passed to `egrep` (see below).  You can have multiple occurrences of flags to use for filtering. 
 
 | Option | Description | Default |
 |--------|-------------|---------|
@@ -159,20 +159,20 @@ The options that select or ignore files and directories (`xd`, `od`, `xf`, `of`,
 * You can use the variants `ixd`, `iod`, `ixf`, or `iof` if the arguments contain commas
 * Will combine with filtering provided by Github when `+g` is used
 
-## Configuring mgrep options with .mgrep
+## Configuring gper options with .gper
 
 ### Description
 
-The `mgrep` script supports custom configurations through a `.mgrep` file located in the base directory of the search or in the user's $HOME directory. This file allows users to set up their preferred environment and default flags for `mgrep`.
+The `gper` script supports custom configurations through a `.gper` file located in the base directory of the search or in the user's $HOME directory. This file allows users to set up their preferred environment and default flags for `gper`.
 
 Here's how it works:
 
-* The `.mgrep` file is a shell script (Zsh) that defines functions to set various options.
+* The `.gper` file is a shell script (Zsh) that defines functions to set various options.
 * These functions can be used to ignore specific directories or files, set the GitHub usage flag, and more.
 * Users can define their own functions to group common settings (e.g., `ignore_npm`, `ignore_artifact`).
 * At the end of the file, users can call these functions to apply their preferred settings.
 
-Example usage (from file `dot-mgrep.example.zsh`):
+Example usage (from file `dot-gper.example.zsh`):
 
 ```zsh
 
@@ -186,21 +186,21 @@ ignore_minified
 ignore_package_manager_artifact
 ```
 
-By grouping together favorite combinations of flags and qualifiers, it is easy to adapt `mgrep` for different projects or environments. Users can quickly switch between different configurations by commenting/uncommenting function calls at the end of the file.
+By grouping together favorite combinations of flags and qualifiers, it is easy to adapt `gper` for different projects or environments. Users can quickly switch between different configurations by commenting/uncommenting function calls at the end of the file.
 
 ### Application of options
 
-With the `.mgrep` file, your runtime preferencs will be applied in the following order:
+With the `.gper` file, your runtime preferencs will be applied in the following order:
 
-* The `.mgrep` file in your home directory will be read first
-* A local `.mgrep` file at the starting point of the search will be read next, which will combine with or override options in `$HOME/mgrep`
-* If an initialization command is supplied with `+i` that matches the name of a function defined in `.mgrep`, it will be run inline to specialize preferences (using the shell's `.` command)
+* The `.gper` file in your home directory will be read first
+* A local `.gper` file at the starting point of the search will be read next, which will combine with or override options in `$HOME/gper`
+* If an initialization command is supplied with `+i` that matches the name of a function defined in `.gper`, it will be run inline to specialize preferences (using the shell's `.` command)
 * Flags submitted on the command line will be processed last, combining with and overriding all previously set options.
 
 To see what options would be in effect in any particlar run, you can apply the `+n` flag to just do a dry run.  The options will show with an `options` tag on standard error output.  This command will show you debugging output and errors only, without execting the search.
 
 ```sh
-$ mgrep +n anystring
+$ gper +n anystring
 DEBUG [options]: debug=1 dry_run=1 github=1 show=0 xf=() of=() xd=() od=() init=''
 DEBUG [process]: using git to list files (directory in git)
 DEBUG [execute]: command = [git ls-files -z . | xargs -0 egrep --binary-files=without-match --files-with-matches 'anystring']
@@ -211,7 +211,7 @@ DEBUG [execute]: command = [git ls-files -z . | xargs -0 egrep --binary-files=wi
 Because this script delegates its matching to `egrep`, the `egrep`-style of regular expression syntax is fully supported and needs only be quoted normally.  It also support per-pattern flags, which will precede each pattern argument in every call to `egrep`. Taking from the above example, we can list the files that contain both the string `foreach` in any mix of lowercase or uppercase characters and the string `iterate` as a whole word in only lowercase by applying separate flags for each pattern.
 
 ```sh
-mgrep -i foreach -w iterate
+gper -i foreach -w iterate
 ```
 The results will contain the following:
 
@@ -224,10 +224,10 @@ but will exclude `src/array-utils.js`, because it does not contain `iterate` as 
 
 ## See the matches
 
-`mgrep` will also allow you to see the matches, rather than just the file names that match. To do this, provide `+s` flag.
+`gper` will also allow you to see the matches, rather than just the file names that match. To do this, provide `+s` flag.
 
 ```sh
-mgrep +s iterate -i foreach
+gper +s iterate -i foreach
 ```
 
 ```
@@ -247,10 +247,10 @@ test/test all.js:// iterate over this array
 
 ### Raw search, without Git or just ignoring it
 
-By default, `mgrep` will traverse the files listed in a Git sourcebase.  However, if you do not have `git` in your command path or are not in a directory structure that is manged by Git, `mgrep` will use `find` rather than `git ls-files` to get its initial file list to search. If you **are** in a Git directory hierarchy, and want to traverse all files anyway, you can supply the `+G` flag:
+By default, `gper` will traverse the files listed in a Git sourcebase.  However, if you do not have `git` in your command path or are not in a directory structure that is manged by Git, `gper` will use `find` rather than `git ls-files` to get its initial file list to search. If you **are** in a Git directory hierarchy, and want to traverse all files anyway, you can supply the `+G` flag:
 
 ```sh
-mgrep +G abc def
+gper +G abc def
 ```
 
 would generate this command to search:
@@ -274,13 +274,13 @@ which means all text files under the current directory would be searched if the 
 
 ### Raw search, exclude certain directories
 
-If you don't want certain directories traversed, you can name them in command arguments to `mgrep`.  For example, if you do not want to traverse directories named `log`, `tmp`, or `.git` anywhere in the hierarchy, you can use this command:
+If you don't want certain directories traversed, you can name them in command arguments to `gper`.  For example, if you do not want to traverse directories named `log`, `tmp`, or `.git` anywhere in the hierarchy, you can use this command:
 
 ```sh
-mgrep +G +xd=log,tmp,.git abc def
+gper +G +xd=log,tmp,.git abc def
 ```
 
-to make `mgrep` use this command to search:
+to make `gper` use this command to search:
 
 ```sh
 find . \( -type d \( -name 'log' -o -name 'tmp' -o -name '.git' \) ! -name . -prune \) -o -type f -print0 | \
@@ -299,7 +299,7 @@ xargs -0 \
 This would also work with shell-style wildcards, which are supported by `find`.  For example, to exclude all hidden directories, you could use:
 
 ```sh
-mgrep +xd='.*' abc def
+gper +xd='.*' abc def
 ```
 
 would cause the initial file list to be generated with:
@@ -312,10 +312,10 @@ which ignores all directories named with a leading `.` (not including `.`, of co
 
 ### Raw search, but only in certain directories
 
-You can also use `mgrep` with `+od` to look only under certain directories by name, excluding all others.  You can use wildcards here as well.
+You can also use `gper` with `+od` to look only under certain directories by name, excluding all others.  You can use wildcards here as well.
 
 ```sh
-mgrep +G +xd=.git +od='node_modules,.npm*' eslint airbnb
+gper +G +xd=.git +od='node_modules,.npm*' eslint airbnb
 ```
 
 The above would cause the search to occur only on plain files in directory hierarchies that are under directories name `node_modules` or under `.npm*` but nowhere under `.git`:
@@ -333,7 +333,7 @@ The command:
 
 
 ```sh
-mgrep +G +xd=tmp +of=package.json,package-lock.json,.pnpm-lock.yaml module1 module2
+gper +G +xd=tmp +of=package.json,package-lock.json,.pnpm-lock.yaml module1 module2
 ```
 
 will list all plain files named `package.json`, `package-lock.json`, or `.pnpm-lock.yaml` not in a hierachy under any directory named `tmp` and that contain both strings `module1` and `module2`.  The generated command would look this way:

@@ -41,14 +41,14 @@ debug=0
 dry_run=0
 
 declare -a xf xd of od
-default_init=init_mgrep
+default_init=init_gper
 init="$default_init"
 
 # Process option file, if exists
 # Get functions defined now
 before_funcs=(${(k)functions})
 
-option_files=($HOME/.mgrep .mgrep)
+option_files=($HOME/.gper .gper)
 for option_file in "${option_files[@]}"
 do
   if [[ -f "$option_file" ]]
@@ -438,7 +438,7 @@ then
     eval "$command"
   fi
 else
-  match_data_file=/tmp/mgrep-$$.tmp
+  match_data_file=/tmp/gper-$$.tmp
   trap 'rm -f $match_data_file; exit 1' 1 2 5 15
 
   cmd="$command > $match_data_file"
